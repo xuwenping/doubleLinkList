@@ -168,42 +168,49 @@ static ListNode *ListNode_get_node(List *thiz, size_t index, size_t fail_return_
   return iter;
 }
 
+/*
+ * delete specify node from linklist
+ */
 DListRet List_delete(List *thiz, size_t index)
 {
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
   ret_val_if_fail(thiz->count > index, DList_Ret_Index_Overstep);
 
-  if (0 == index)
+  ListNode *cursor = ListNode_get_node(thiz, index, 0);
+  ret_val_if_fail(NULL != cursor, DList_Ret_InvalidParams);
+
+  // when there is only a node
+  if (thiz->first == cursor && thiz->last == cursor)
   {
-    ListNode_destroy(thiz->first);
-    thiz->count -= 1;
     thiz->first = NULL;
     thiz->last = NULL;
-    return DList_Ret_OK;
   }
-
-  ListNode *iter = thiz->first;
-  int i = 0;
-  for (; i < index-1; ++i)
+  // when the specify node is the first node
+  else if (thiz->first == cursor)
   {
-    iter = iter->next;
+    cursor->next->prev = NULL;
+    thiz->first = cursor->next;
   }
-  ListNode *needDestroyNode = iter->next;
-  iter->next = needDestroyNode->next;
-  if (iter->next != NULL)
+  // when the specify node is the last node
+  else if (thiz->last == cursor)
   {
-    iter->next->prev = iter;
+    cursor->prev->next = NULL;
+    thiz->last = cursor->prev;
   }
   else
   {
-    thiz->last = iter;
+    cursor->next->prev = cursor->prev;
+    cursor->prev->next = cursor->next;
   }
   thiz->count -= 1;
-  ListNode_destroy(needDestroyNode);
+  ListNode_destroy(cursor);
 
   return DList_Ret_OK;
 }
 
+/*
+ * get specify node value from linklist
+ */
 DListRet List_get_by_index(List *thiz, size_t index, void **value)
 {
   ListNode *cursor = ListNode_get_node(thiz, index, 0);
@@ -229,4 +236,18 @@ size_t List_length(List *thiz)
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
 
   return thiz->count;
+}
+
+DListRet List_foreach(List *thiz, ListDataVisitFunc visit, void *ctx)
+{
+  ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
+
+  ListNode *iter = thiz->first;
+  while (NULL != iter)
+  {
+    visit(ctx, iter->value);
+    iter = iter->next;
+  }
+
+  return DList_Ret_OK;
 }

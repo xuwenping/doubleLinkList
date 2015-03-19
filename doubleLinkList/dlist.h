@@ -30,6 +30,8 @@ typedef enum _DListRet {
 struct _List;
 typedef struct _List List;
 
+typedef DListRet (*ListDataVisitFunc)(void *ctx, void *value);
+
 List *List_create();
 DListRet List_destroy(List *thiz);
 
@@ -41,4 +43,7 @@ DListRet List_get_by_index(List *thiz, size_t index, void** data);
 DListRet List_set_by_index(List *thiz, size_t index, void *value);
 
 size_t List_length(List *thiz);
+
+DListRet List_foreach(List *thiz, ListDataVisitFunc visit, void *ctx);
+
 #endif /*DLIST_H*/
