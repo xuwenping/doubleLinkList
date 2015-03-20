@@ -228,7 +228,7 @@ DListRet List_set_by_index(List *thiz, size_t index, void *value)
 
   cursor->value = value;
 
-  return DList_Ret_Fail;
+  return DList_Ret_OK;
 }
 
 size_t List_length(List *thiz)
