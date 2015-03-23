@@ -14,6 +14,9 @@ struct _DArray {
   size_t alloc_size;
 };
 
+/*
+ * create a dynamic array
+ */
 DArray *darray_create()
 {
   DArray *thiz = (DArray *)malloc(sizeof(DArray));
@@ -26,6 +29,9 @@ DArray *darray_create()
   return thiz;
 }
 
+/*
+ * expand dynamic array when accutly size larger than alloced size
+ */
 #define MIN_PRE_ALLOCATE_NR 10
 static Ret darray_expand(DArray *thiz, size_t need)
 {
@@ -43,6 +49,10 @@ static Ret darray_expand(DArray *thiz, size_t need)
   return ((thiz->size + need) <= thiz->alloc_size) ? Ret_OK : Ret_Fail;
 }
 
+/*
+ * shrink dynamic array size when accutly size less than unused size(thiz->alloc_size >> 1),
+ * 
+ */
 static Ret darray_shrink(DArray *thiz)
 {
   ret_val_if_fail(NULL != thiz, Ret_InvalidParams);
@@ -59,6 +69,9 @@ static Ret darray_shrink(DArray *thiz)
   return Ret_OK;
 }
 
+/*
+ * destroy dynamic array 
+ */
 Ret darray_destroy(DArray *thiz)
 {
   ret_val_if_fail(NULL != thiz, Ret_InvalidParams);
@@ -81,6 +94,7 @@ Ret darray_destroy(DArray *thiz)
 }
 
 /*
+ * insert a value by specify index 
  * notion: the index start from 0
  */
 Ret darray_insert(DArray *thiz, size_t index, void *value)
@@ -109,6 +123,9 @@ Ret darray_insert(DArray *thiz, size_t index, void *value)
   return ret;
 }
 
+/*
+ * add a value on the array head
+ */
 Ret darray_prepend(DArray *thiz, void *value)
 {
   ret_val_if_fail(NULL != thiz, Ret_InvalidParams);
@@ -116,6 +133,9 @@ Ret darray_prepend(DArray *thiz, void *value)
   return darray_insert(thiz, 0, value);
 }
 
+/*
+ * add a value on the array last
+ */
 Ret darray_append(DArray *thiz, void *value)
 {
   ret_val_if_fail(NULL != thiz, Ret_InvalidParams);
