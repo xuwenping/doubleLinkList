@@ -78,7 +78,42 @@ Ret insert_sort(void **array, size_t nr, DataCompareFunc cmp)
   return Ret_OK;
 }
 
+static void quick_sort_impl(void **array, size_t left, size_t right, DataCompareFunc cmp)
+{
+  size_t save_left = left;
+  size_t save_right = right;
+  void *x = array[left];
+
+  while(left < right)
+  {
+    while((cmp(array[right], x) >= 0) && (left < right)) {--right;} 
+    if(left != right)
+    {
+      array[left] = array[right];
+      ++left;
+    }
+
+    while((cmp(array[left], x) <= 0) && (left < right)) {++left;}
+    if(left != right)
+    {
+      array[right] = array[left];
+      --right;
+    }
+  }
+  array[left] = x;
+
+
+}
+
 Ret quick_sort(void **array, size_t nr, DataCompareFunc cmp)
 {
+  ret_val_if_fail((NULL != array) && (NULL != cmp), Ret_InvalidParams);
 
+  Ret ret = Ret_OK;
+  if(nr > 1)
+  {
+    quick_sort_impl(array, 0, (nr-1), cmp);  
+  }
+
+  return ret;
 }
