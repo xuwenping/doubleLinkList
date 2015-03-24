@@ -1,5 +1,6 @@
 all:
-	gcc dlist.c main.co -o main
+	gcc -g -fPIC -shared darray.c -o libdarray.so
+	gcc -g -DDARRAY_TEST darray.c -o darray_test -g
 
 clean:
-	rm -f main
+	rm -f *test *.exe *.so 

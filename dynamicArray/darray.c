@@ -6,6 +6,7 @@
  ************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "darray.h"
 
 struct _DArray {
@@ -143,6 +144,9 @@ Ret darray_append(DArray *thiz, void *value)
   return darray_insert(thiz, -1, value);
 }
 
+/*
+ * delete sepcify index data 
+ */
 Ret darray_delete(DArray *thiz, size_t index)
 {
   ret_val_if_fail(NULL != thiz && index < thiz->size, Ret_InvalidParams);
@@ -154,29 +158,41 @@ Ret darray_delete(DArray *thiz, size_t index)
     thiz->data[i] = thiz->data[i+1];
   }
   thiz->size--;
+
+  // shrink darray size
   darray_shrink(thiz);
 
   return Ret_OK;
 }
 
-Ret darray_get_by_index(DArray *thiz, size_t index, void **value)
+/*
+ * get value by specify index
+ */
+Ret darray_get_by_index(DArray *thiz, size_t index, void *value)
 {
   ret_val_if_fail(thiz != NULL && value != NULL && index < thiz->size, Ret_InvalidParams);
 
-  *value = thiz->data[index];
+  int *temp = value;
+  *temp = thiz->data[index];
 
   return Ret_OK;
 }
 
+/*
+ * set value by sepcify index
+ */
 Ret darray_set_by_index(DArray *thiz, size_t index, void *value)
 {
-  ret_val_if_fail(thiz != NULL && value != NULL && index < thiz->size, Ret_InvalidParams);
+  ret_val_if_fail((thiz != NULL) && (index < thiz->size), Ret_InvalidParams);
 
   thiz->data[index] = value;
 
   return Ret_OK;
 }
 
+/*
+ * get dynamic array length
+ */
 size_t darray_length(DArray *thiz)
 {
   ret_val_if_fail(NULL != thiz, 0);
@@ -184,6 +200,9 @@ size_t darray_length(DArray *thiz)
   return thiz->size;
 }
 
+/*
+ * for each array element 
+ */
 Ret darray_froeach(DArray *thiz, DArrayDataVisitFunc visit, void *ctx)
 {
   ret_val_if_fail(NULL != thiz, Ret_InvalidParams);
@@ -197,3 +216,54 @@ Ret darray_froeach(DArray *thiz, DArrayDataVisitFunc visit, void *ctx)
 
   return ret;
 }
+
+#ifdef DARRAY_TEST
+
+#include <assert.h>
+
+Ret print_int(void *ctx, void *value)
+{
+  printf("the value is %d\n", (int)value);
+
+  return Ret_OK;
+}
+
+void test_int_darray(void)
+{
+  DArray *thiz = darray_create();
+  
+  size_t i = 0;
+  size_t n = 100;
+  int data = 0;
+
+  for(i = 0; i < n; ++i)
+  {
+    assert(darray_prepend(thiz, (void *)i) == Ret_OK);
+    assert(darray_length(thiz) == (i+1));
+    assert(darray_get_by_index(thiz, 0, &data) == Ret_OK);
+    assert(data == i);
+    assert(darray_set_by_index(thiz, 0, (void *)(2*i)) == Ret_OK);
+    assert(darray_get_by_index(thiz, 0, &data) == Ret_OK);
+    assert(data == 2*i);
+    assert(darray_set_by_index(thiz, 0, (void *)i) == Ret_OK);
+  }
+
+  assert(darray_froeach(thiz, print_int, NULL) == Ret_OK);
+
+  for(i = 0; i < n; ++i)
+  {
+    assert(darray_delete(thiz, 0) == Ret_OK);
+  }
+  assert(darray_length(thiz) == 0);
+  assert(darray_froeach(thiz, print_int, NULL) == Ret_OK);
+  darray_destroy(thiz);
+}
+
+int main()
+{
+  test_int_darray();
+
+  return 0;
+}
+#endif
+
