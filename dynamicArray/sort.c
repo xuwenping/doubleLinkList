@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "sort.h"
 
-Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp)
+Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp, DataSwapFunc swap)
 {
   printf("enter %s\n", __func__);
   int i = 0;
@@ -17,12 +17,12 @@ Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp)
   {
     for(j = 0; j < nr-1-i; ++j)
     {
+      printf("bubble before: the array[%d]=%d, the array[%d]=%d\n", j, array[j], j+1, array[j+1]);
       if(cmp(array[j], array[j+1]) > 0)
       {
-        void *temp = array[j];
-        array[j] = array[j+1];
-        array[j+1] = temp;
+        swap(array[j], array[j+1]);
       }
+      printf("bubble after: the array[%d]=%d, the array[%d]=%d\n", j, array[j], j+1, array[j+1]);
     }
   }
 
@@ -140,7 +140,16 @@ static int int_cmp_invert(void *a, void *b)
   return (int)b - (int)a;
 }
 
-static void **create_int_array(int n)
+static void int_swap(void *a, void *b)
+{
+  int *temp_a = a;
+  int *temp_b = b;
+  int temp = temp_a;
+  temp_a = temp_b;
+  temp_b = temp;
+}
+
+static int *create_int_array(int n)
 {
   printf("enter %s\n", __func__);
   int i = 0;
@@ -148,7 +157,7 @@ static void **create_int_array(int n)
   
   for(i = 0; i < n; ++i)
   {
-    array[i] = i;//rand();
+    array[i] = rand();
   }
 
   printf("end %s\n", __func__);
@@ -159,15 +168,19 @@ void sort_test_one_asc(SortFunc sort, int n)
 {
   int i = 0;
   void **array = create_int_array(n);
+  for(i = 0; i < n; ++i)
+  {
+    printf("the element is %d\n", (int)array[i]);
+  }
   ret_if_fail(NULL != array);
-  sort(array, n, int_cmp);
+  sort(array, n, int_cmp, int_swap);
   printf("the n value is %d\n", n);
 
-  /*for(i=1; i < n; ++i)
+  for(i=1; i < n; ++i)
   {
     printf("asc: the array[%d]=%d, the array[%d]=%d\n", i, array[i], i-1, array[i-1]);
     assert(array[i] >= array[i-1]);
-  }*/
+  }
 
 
   printf("the n value is %p\n", array);
@@ -179,7 +192,7 @@ void sort_test_one_dec(SortFunc sort, int n)
 {
   int i = 0;
   void **array = create_int_array(n);
-  sort(array, n, int_cmp_invert);
+  sort(array, n, int_cmp_invert, int_swap);
 
   for(i = 1; i < n; ++i)
   {
@@ -193,7 +206,7 @@ void sort_test_one_dec(SortFunc sort, int n)
 static void sort_test(SortFunc sort)
 {
   int i = 0;
-  for(i = 1; i < 1000; ++i)
+  for(i = 1; i < 100; ++i)
   {
     printf("the i is %d\n", i);
     sort_test_one_asc(sort, i);

@@ -10,7 +10,7 @@
 
 #include "typedef.h"
 
-Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp);
+Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp, DataSwapFunc swap);
 
 Ret change_sort(void **array, size_t nr, DataCompareFunc cmp);
 

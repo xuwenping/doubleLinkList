@@ -31,5 +31,6 @@ typedef enum _Ret {
 
 typedef Ret (*DArrayDataVisitFunc)(void *ctx, void *value);
 typedef int (*DataCompareFunc)(void *a, void *b);
-typedef Ret (*SortFunc)(void **array, size_t nr, DataCompareFunc cmp);
+typedef void (*DataSwapFunc)(void *a, void *b);
+typedef Ret (*SortFunc)(void **array, size_t nr, DataCompareFunc cmp, DataSwapFunc swap);
 #endif
