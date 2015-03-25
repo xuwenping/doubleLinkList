@@ -8,24 +8,20 @@
 #include <stdio.h>
 #include "sort.h"
 
-static void swap(void *a, void *b)
-{
-  void *temp = *a;
-  *a = *b;
-  *b = temp;
-}
-
 Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp)
 {
+  printf("enter %s\n", __func__);
   int i = 0;
-  int j = 1;
-  for(i = 0; i < nr-1; ++i)
+  int j = 0;
+  for(i = 0; i < (nr-1); ++i)
   {
-    for(j = 1; j < nr; ++j)
+    for(j = 0; j < nr-1-i; ++j)
     {
-      if(cmp(array[i], array[j]) > 0)
+      if(cmp(array[j], array[j+1]) > 0)
       {
-        swap(&array[i], &array[j]);
+        void *temp = array[j];
+        array[j] = array[j+1];
+        array[j+1] = temp;
       }
     }
   }
@@ -51,7 +47,9 @@ Ret change_sort(void **array, size_t nr, DataCompareFunc cmp)
 
     if(iMax != i)
     {
-      swap(&array[iMax], &array[i]);
+      void *temp = array[iMax];
+      array[iMax] = array[i];
+      array[i] = temp;
     }
   }
 
@@ -69,7 +67,9 @@ Ret insert_sort(void **array, size_t nr, DataCompareFunc cmp)
     {
       if(cmp(array[j-1], array[j]) > 0)
       {
-        swap(&array[j-1], &array[j]);
+        void *temp = array[j-1];
+        array[j-1] = array[j];
+        array[j] = temp;
       }
       --j;
     }
@@ -101,8 +101,16 @@ static void quick_sort_impl(void **array, size_t left, size_t right, DataCompare
     }
   }
   array[left] = x;
+  
+  if(save_left < left)
+  {
+    quick_sort_impl(array, save_left, left-1, cmp);
+  }
 
-
+  if(save_right > left)
+  {
+    quick_sort_impl(array, left+1, save_right, cmp);
+  }
 }
 
 Ret quick_sort(void **array, size_t nr, DataCompareFunc cmp)
@@ -117,3 +125,86 @@ Ret quick_sort(void **array, size_t nr, DataCompareFunc cmp)
 
   return ret;
 }
+
+#ifdef SORT_TEST
+
+#include <stdlib.h>
+
+static int int_cmp(void *a, void *b)
+{
+  return (int)a - (int)b;
+}
+
+static int int_cmp_invert(void *a, void *b)
+{
+  return (int)b - (int)a;
+}
+
+static void **create_int_array(int n)
+{
+  printf("enter %s\n", __func__);
+  int i = 0;
+  int *array = (int *)malloc(sizeof(int) * n);
+  
+  for(i = 0; i < n; ++i)
+  {
+    array[i] = i;//rand();
+  }
+
+  printf("end %s\n", __func__);
+  return (void **)array;
+}
+
+void sort_test_one_asc(SortFunc sort, int n)
+{
+  int i = 0;
+  void **array = create_int_array(n);
+  ret_if_fail(NULL != array);
+  sort(array, n, int_cmp);
+  printf("the n value is %d\n", n);
+
+  /*for(i=1; i < n; ++i)
+  {
+    printf("asc: the array[%d]=%d, the array[%d]=%d\n", i, array[i], i-1, array[i-1]);
+    assert(array[i] >= array[i-1]);
+  }*/
+
+
+  printf("the n value is %p\n", array);
+  free(array);
+  array = NULL;
+}
+
+void sort_test_one_dec(SortFunc sort, int n)
+{
+  int i = 0;
+  void **array = create_int_array(n);
+  sort(array, n, int_cmp_invert);
+
+  for(i = 1; i < n; ++i)
+  {
+    printf("dec: the array[%d]=%d, the array[%d]=%d\n", i, array[i], i-1, array[i-1]);
+    assert(array[i] <= array[i-1]);
+  }
+
+  free(array);
+}
+
+static void sort_test(SortFunc sort)
+{
+  int i = 0;
+  for(i = 1; i < 1000; ++i)
+  {
+    printf("the i is %d\n", i);
+    sort_test_one_asc(sort, i);
+    //sort_test_one_dec(sort, i);
+  }
+}
+
+int main()
+{
+  srand(100);
+  sort_test(bubble_sort);
+  return 0;
+}
+#endif
