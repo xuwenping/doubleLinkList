@@ -15,14 +15,14 @@ Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp, DataSwapFunc swap)
   int j = 0;
   for(i = 0; i < (nr-1); ++i)
   {
-    for(j = 0; j < nr-1-i; ++j)
+    for(j = i+1; j < nr; ++j)
     {
-      printf("bubble before: the array[%d]=%d, the array[%d]=%d\n", j, array[j], j+1, array[j+1]);
-      if(cmp(array[j], array[j+1]) > 0)
+      printf("bubble before: the array[%d]=%d, the array[%d]=%d\n", i, array[i], j, array[j]);
+      if(cmp(array[i], array[j]) > 0)
       {
-        swap(array[j], array[j+1]);
+        swap(&array[i], &array[j]);
       }
-      printf("bubble after: the array[%d]=%d, the array[%d]=%d\n", j, array[j], j+1, array[j+1]);
+      printf("bubble after: the array[%d]=%d, the array[%d]=%d\n", i, array[i], j, array[j]);
     }
   }
 
@@ -144,22 +144,25 @@ static void int_swap(void *a, void *b)
 {
   int *temp_a = a;
   int *temp_b = b;
-  int temp = temp_a;
-  temp_a = temp_b;
-  temp_b = temp;
+  int temp = *temp_a;
+  *temp_a = *temp_b;
+  *temp_b = temp;
 }
 
-static int *create_int_array(int n)
+static void **create_int_array(int n)
 {
   printf("enter %s\n", __func__);
   int i = 0;
-  int *array = (int *)malloc(sizeof(int) * n);
-  
+  int *array = (int *)malloc(sizeof(int*) * n);
+  printf("%s: the array addr is %p\n", __func__, array); 
   for(i = 0; i < n; ++i)
   {
     array[i] = rand();
   }
-
+  for(i=0; i < n; ++i)
+  {
+    printf("%s: the array[%d]=%d\n", __func__, i, array[i]);
+  }
   printf("end %s\n", __func__);
   return (void **)array;
 }
@@ -168,23 +171,26 @@ void sort_test_one_asc(SortFunc sort, int n)
 {
   int i = 0;
   void **array = create_int_array(n);
+  printf("%s: the cover array addr is %p\n", __func__, array); 
   for(i = 0; i < n; ++i)
   {
-    printf("the element is %d\n", (int)array[i]);
+    printf("%s: the array[%d]=%d\n", __func__, i, (int)array[i]);
   }
   ret_if_fail(NULL != array);
   sort(array, n, int_cmp, int_swap);
-  printf("the n value is %d\n", n);
+  //printf("the n value is %d\n", n);
 
   for(i=1; i < n; ++i)
   {
-    printf("asc: the array[%d]=%d, the array[%d]=%d\n", i, array[i], i-1, array[i-1]);
-    assert(array[i] >= array[i-1]);
+    //printf("%s: the array[%d]=%d, the array[%d]=%d\n", __func__, i, array[i], i-1, array[i-1]);
+    assert((int)array[i] >= (int)array[i-1]);
   }
-
-
-  printf("the n value is %p\n", array);
-  free(array);
+  for(i=0; i < n; ++i)
+  {
+    printf("%s: the array[%d]=%d\n", __func__, i, (int)array[i]);
+  }
+  printf("%s: the array ptr is %p\n", __func__, array);
+  //free((int *)array);
   array = NULL;
 }
 
@@ -206,10 +212,9 @@ void sort_test_one_dec(SortFunc sort, int n)
 static void sort_test(SortFunc sort)
 {
   int i = 0;
-  for(i = 1; i < 100; ++i)
+  //for(i = 1; i < 100; ++i)
   {
-    printf("the i is %d\n", i);
-    sort_test_one_asc(sort, i);
+    sort_test_one_asc(sort, 10);
     //sort_test_one_dec(sort, i);
   }
 }
