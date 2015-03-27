@@ -217,6 +217,12 @@ Ret darray_froeach(DArray *thiz, DArrayDataVisitFunc visit, void *ctx)
   return ret;
 }
 
+Ret darray_sort(DArray *thiz, SortFunc sort, DataCompareFunc cmp)
+{
+  ret_val_if_fail(NULL != thiz, Ret_InvalidParams);
+  return sort(thiz->data, thiz->size, cmp);
+}
+
 #ifdef DARRAY_TEST
 
 #include <assert.h>

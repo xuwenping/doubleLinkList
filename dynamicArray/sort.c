@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "sort.h"
 
-Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp, DataSwapFunc swap)
+Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp/*, DataSwapFunc swap*/)
 {
   printf("enter %s\n", __func__);
   int i = 0;
@@ -20,7 +20,10 @@ Ret bubble_sort(void **array, size_t nr, DataCompareFunc cmp, DataSwapFunc swap)
       printf("bubble before: the array[%d]=%d, the array[%d]=%d\n", i, array[i], j, array[j]);
       if(cmp(array[i], array[j]) > 0)
       {
-        swap(&array[i], &array[j]);
+        //swap(&array[i], &array[j]);
+        void *temp = array[i];
+        array[i] = array[j];
+        array[j]= temp;
       }
       printf("bubble after: the array[%d]=%d, the array[%d]=%d\n", i, array[i], j, array[j]);
     }
@@ -140,20 +143,11 @@ static int int_cmp_invert(void *a, void *b)
   return (int)b - (int)a;
 }
 
-static void int_swap(void *a, void *b)
-{
-  int *temp_a = a;
-  int *temp_b = b;
-  int temp = *temp_a;
-  *temp_a = *temp_b;
-  *temp_b = temp;
-}
-
 static void **create_int_array(int n)
 {
   printf("enter %s\n", __func__);
   int i = 0;
-  int *array = (int *)malloc(sizeof(int*) * n);
+  void **array = (void **)malloc(sizeof(void*) * n);
   printf("%s: the array addr is %p\n", __func__, array); 
   for(i = 0; i < n; ++i)
   {
@@ -164,7 +158,7 @@ static void **create_int_array(int n)
     printf("%s: the array[%d]=%d\n", __func__, i, array[i]);
   }
   printf("end %s\n", __func__);
-  return (void **)array;
+  return array;
 }
 
 void sort_test_one_asc(SortFunc sort, int n)
@@ -177,12 +171,10 @@ void sort_test_one_asc(SortFunc sort, int n)
     printf("%s: the array[%d]=%d\n", __func__, i, (int)array[i]);
   }
   ret_if_fail(NULL != array);
-  sort(array, n, int_cmp, int_swap);
-  //printf("the n value is %d\n", n);
+  sort(array, n, int_cmp);
 
   for(i=1; i < n; ++i)
   {
-    //printf("%s: the array[%d]=%d, the array[%d]=%d\n", __func__, i, array[i], i-1, array[i-1]);
     assert((int)array[i] >= (int)array[i-1]);
   }
   for(i=0; i < n; ++i)
@@ -190,7 +182,7 @@ void sort_test_one_asc(SortFunc sort, int n)
     printf("%s: the array[%d]=%d\n", __func__, i, (int)array[i]);
   }
   printf("%s: the array ptr is %p\n", __func__, array);
-  //free((int *)array);
+  free(array);
   array = NULL;
 }
 
@@ -198,7 +190,7 @@ void sort_test_one_dec(SortFunc sort, int n)
 {
   int i = 0;
   void **array = create_int_array(n);
-  sort(array, n, int_cmp_invert, int_swap);
+  sort(array, n, int_cmp_invert);
 
   for(i = 1; i < n; ++i)
   {
@@ -212,10 +204,10 @@ void sort_test_one_dec(SortFunc sort, int n)
 static void sort_test(SortFunc sort)
 {
   int i = 0;
-  //for(i = 1; i < 100; ++i)
+  for(i = 1; i < 100; ++i)
   {
-    sort_test_one_asc(sort, 10);
-    //sort_test_one_dec(sort, i);
+    sort_test_one_asc(sort, i);
+    sort_test_one_dec(sort, i);
   }
 }
 
