@@ -268,8 +268,11 @@ void test_int_dlist(void)
   {
     assert(List_push(dlist, (void *)i) == DList_Ret_OK);
     assert(List_length(dlist) == i + 1);
-    assert(List_get_by_index(dlist, 0, (void **)&data) == DList_Ret_OK);
-    assert(data == i); 
+    void **covert = (void **)&data;
+    assert(List_get_by_index(dlist, 0, covert) == DList_Ret_OK);
+    printf("before: the data is %d, the i is %d\n", data, i);
+    assert((int)data == i); 
+    printf("after: the data is %d, the i is %d\n", data, i);
     assert(List_set_by_index(dlist, 0, (void *)(2*i)) == DList_Ret_OK);
     assert(List_get_by_index(dlist, 0, (void **)&data) == DList_Ret_OK);
     assert(data == 2*i);
@@ -278,7 +281,8 @@ void test_int_dlist(void)
 
   for (i = 0; i < n; ++i)
   {
-    assert(List_get_by_index(dlist, 0, (void **)&data) == DList_Ret_OK);
+    void **covert = (void **)&data;
+    assert(List_get_by_index(dlist, 0, covert) == DList_Ret_OK);
     assert(data == (n - i - 1));
     assert(List_length(dlist) == (n - i));
     assert(List_delete(dlist, 0) == DList_Ret_OK);
@@ -286,6 +290,7 @@ void test_int_dlist(void)
   }
 
   assert(List_length(dlist) == 0);
+  assert(List_destroy(dlist) == DList_Ret_OK);
 }
 
 void test_invalid_params()
