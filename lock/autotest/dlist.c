@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "dlist.h"
+#include <pthread.h>
 
 typedef struct _ListNode {
   struct _ListNode *next;
@@ -20,6 +21,8 @@ struct _List {
   ListNode *first;
   ListNode *last;
 };
+
+pthread_mutex_t mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
  * create a node of linklist by input a value
@@ -96,23 +99,34 @@ DListRet List_push(List *thiz, void *value)
 {
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
 
-  ListNode *node = ListNode_create(value);
-  ret_val_if_fail(NULL != node, DList_Ret_InvalidParams);
+  DListRet ret= DList_Ret_OK;
+  pthread_mutex_lock(&mutex_lock);
 
-  if (0 == thiz->count)
-  {
+  do{
+    ListNode *node = ListNode_create(value);
+    ret_val_if_fail(NULL != node, DList_Ret_InvalidParams);
+
+    pthread_mutex_lock(&mutex_lock);
+
+    if (0 == thiz->count)
+    {
+      thiz->first = node;
+      thiz->last = node;
+      thiz->count += 1;
+      ret = DList_Ret_OK;
+      break;
+    }
+
+    ListNode *iter = thiz->first;
+    node->next = iter;
+    iter->prev = node;
     thiz->first = node;
-    thiz->last = node;
     thiz->count += 1;
-    return DList_Ret_OK;
-  }
+  }while(0);
 
-  ListNode *iter = thiz->first;
-  node->next = iter;
-  iter->prev = node;
-  thiz->first = node;
-  thiz->count += 1;
-  return DList_Ret_OK;
+  pthread_mutex_unlock(&mutex_lock);
+
+  return ret;
 }
 
 /*
