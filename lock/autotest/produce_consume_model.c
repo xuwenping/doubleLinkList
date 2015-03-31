@@ -17,7 +17,6 @@ void consume_create(List *thiz)
 
 void produce_create(List *thiz)
 {
-  List_pop(thiz);
   ret_if_fail(NULL != thiz);
   int a = 1;
 
@@ -29,13 +28,14 @@ void produce_create(List *thiz)
 
 void lock_test(List *thiz)
 {
-  pthread_t t1, t2;
+  pthread_t t1 = 0;
+  pthread_t t2 = 0;
   
   pthread_create(&t1, NULL, produce_create, (void *)thiz);
   pthread_create(&t2, NULL, consume_create, (void *)thiz);
   
-  pthread_join(t1, NULL);
   pthread_join(t2, NULL);
+  pthread_join(t1, NULL);
 }
 
 int main()

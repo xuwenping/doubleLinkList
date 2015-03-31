@@ -106,8 +106,6 @@ DListRet List_push(List *thiz, void *value)
     ListNode *node = ListNode_create(value);
     ret_val_if_fail(NULL != node, DList_Ret_InvalidParams);
 
-    pthread_mutex_lock(&mutex_lock);
-
     if (0 == thiz->count)
     {
       thiz->first = node;
@@ -136,9 +134,14 @@ DListRet List_pop(List *thiz)
 {
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
 
-  ret_val_if_fail(0 == thiz->count, DList_Ret_ListIsEmpty);
+  //ret_val_if_fail(0 == thiz->count, DList_Ret_ListIsEmpty);
 
-  if (1 == thiz->count)
+  pthread_mutex_lock(&mutex_lock);
+  if(0 == thiz->count)
+  {
+
+  }
+  else if (1 == thiz->count)
   {
     ListNode_destroy(thiz->first);
     thiz->count -= 1;
@@ -152,6 +155,8 @@ DListRet List_pop(List *thiz)
     thiz->count -= 1;
     ListNode_destroy(iter);
   }
+
+  pthread_mutex_unlock(&mutex_lock);
 
   return DList_Ret_OK;
 }
