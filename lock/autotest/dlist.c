@@ -7,8 +7,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "dlist.h"
 #include <pthread.h>
+#include "dlist.h"
 
 typedef struct _ListNode {
   struct _ListNode *next;
@@ -20,9 +20,8 @@ struct _List {
   int count;
   ListNode *first;
   ListNode *last;
+  Locker *locker;
 };
-
-pthread_mutex_t mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 
 /*
  * create a node of linklist by input a value
@@ -53,13 +52,14 @@ static void ListNode_destroy(ListNode *node)
  * define a structure that store linklist's first node and last node, 
  * and malloc space to the structure.
  */
-List *List_create()
+List *List_create(Locker *locker)
 {
   List *thiz = (List *)malloc(sizeof(List));
   ret_val_if_fail(NULL != thiz, NULL);
   thiz->count = 0;
   thiz->first = NULL;
   thiz->last = NULL;
+  thiz->locker = locker;
 
   return thiz;
 }
@@ -100,7 +100,6 @@ DListRet List_push(List *thiz, void *value)
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
 
   DListRet ret= DList_Ret_OK;
-  pthread_mutex_lock(&mutex_lock);
 
   do{
     ListNode *node = ListNode_create(value);
@@ -122,8 +121,6 @@ DListRet List_push(List *thiz, void *value)
     thiz->count += 1;
   }while(0);
 
-  pthread_mutex_unlock(&mutex_lock);
-
   return ret;
 }
 
@@ -136,7 +133,6 @@ DListRet List_pop(List *thiz)
 
   //ret_val_if_fail(0 == thiz->count, DList_Ret_ListIsEmpty);
 
-  pthread_mutex_lock(&mutex_lock);
   if(0 == thiz->count)
   {
 
@@ -156,7 +152,6 @@ DListRet List_pop(List *thiz)
     ListNode_destroy(iter);
   }
 
-  pthread_mutex_unlock(&mutex_lock);
 
   return DList_Ret_OK;
 }

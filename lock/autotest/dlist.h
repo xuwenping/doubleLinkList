@@ -9,8 +9,9 @@
 #define DLIST_H
 
 #include "typedef.h"
+#include "locker_pthread.h"
 
-List *List_create();
+List *List_create(Locker *locker);
 DListRet List_destroy(List *thiz);
 
 DListRet List_push(List *thiz, void *value);

@@ -26,4 +26,31 @@ struct _Locker
   char priv[0];
 };
 
+static inline DListRet Locker_lock(Locker *thiz)
+{
+  ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);  
+
+  thiz->lock(thiz);
+
+  return DList_Ret_OK;
+}
+
+static inline DListRet Locker_unlock(Locker *thiz)
+{
+  ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);  
+
+  thiz->unlock(thiz);
+
+  return DList_Ret_OK;
+}
+
+static inline DListRet Locker_destroy(Locker *thiz)
+{
+  ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);  
+
+  thiz->destroy(thiz);
+
+  return DList_Ret_OK;
+}
+
 #endif
