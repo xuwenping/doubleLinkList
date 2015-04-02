@@ -48,6 +48,30 @@ static void ListNode_destroy(ListNode *node)
   free(node);
 }
 
+static void List_lock(List *thiz)
+{
+  if((NULL != thiz) && (NULL != thiz->locker))
+  {
+    Locker_lock(thiz->locker);
+  }
+}
+
+static void List_unlock(List *thiz)
+{
+  if((NULL != thiz) && (NULL != thiz->locker))
+  {
+    Locker_unlock(thiz->locker);
+  }
+}
+
+static void List_destroy_locker(List *thiz)
+{
+  if((NULL != thiz) && (NULL != thiz->locker))
+  {
+    Locker_destroy(thiz->locker);
+  }
+}
+
 /*
  * define a structure that store linklist's first node and last node, 
  * and malloc space to the structure.
@@ -72,23 +96,33 @@ DListRet List_destroy(List *thiz)
 {
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
 
-  // if the count is equal to zero, represent that only free the structure
-  // that store linklist's first node and last node
-  if (0 == thiz->count)
-  {
-    free(thiz);
-    return DList_Ret_OK;
-  }
+  DListRet ret = DList_Ret_OK;
 
-  ListNode *current = thiz->first;
-  while (NULL != current)
-  {
-    thiz->first = current->next;
-    ListNode_destroy(current);
-    current = thiz->first;
-  }
+  List_lock(thiz);
 
+  do
+  {
+    // if the count is equal to zero, represent that only free the structure
+    // that store linklist's first node and last node
+    if (0 == thiz->count)
+    {
+      ret = DList_Ret_OK;
+      break;
+    }
+
+    ListNode *current = thiz->first;
+    while (NULL != current)
+    {
+      thiz->first = current->next;
+      ListNode_destroy(current);
+      current = thiz->first;
+    }
+
+  }while(0);
+
+  List_destroy_locker(thiz);
   free(thiz);
+
   return DList_Ret_OK;
 }
 
@@ -100,6 +134,8 @@ DListRet List_push(List *thiz, void *value)
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
 
   DListRet ret= DList_Ret_OK;
+  
+  List_lock(thiz);
 
   do{
     ListNode *node = ListNode_create(value);
@@ -121,6 +157,8 @@ DListRet List_push(List *thiz, void *value)
     thiz->count += 1;
   }while(0);
 
+  List_unlock(thiz);
+
   return ret;
 }
 
@@ -131,7 +169,7 @@ DListRet List_pop(List *thiz)
 {
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
 
-  //ret_val_if_fail(0 == thiz->count, DList_Ret_ListIsEmpty);
+  List_lock(thiz);
 
   if(0 == thiz->count)
   {
@@ -152,6 +190,7 @@ DListRet List_pop(List *thiz)
     ListNode_destroy(iter);
   }
 
+  List_unlock(thiz);
 
   return DList_Ret_OK;
 }
@@ -190,6 +229,8 @@ DListRet List_delete(List *thiz, size_t index)
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
   ret_val_if_fail(thiz->count > index, DList_Ret_Index_Overstep);
 
+  List_lock(thiz);
+
   ListNode *cursor = ListNode_get_node(thiz, index, 0);
   ret_val_if_fail(NULL != cursor, DList_Ret_InvalidParams);
 
@@ -219,6 +260,8 @@ DListRet List_delete(List *thiz, size_t index)
   thiz->count -= 1;
   ListNode_destroy(cursor);
 
+  List_unlock(thiz);
+
   return DList_Ret_OK;
 }
 
@@ -227,20 +270,28 @@ DListRet List_delete(List *thiz, size_t index)
  */
 DListRet List_get_by_index(List *thiz, size_t index, void **value)
 {
+  List_lock(thiz);
+
   ListNode *cursor = ListNode_get_node(thiz, index, 0);
   ret_val_if_fail(NULL != cursor, DList_Ret_Fail);
 
   *value = cursor->value;
+
+  List_unlock(thiz);
 
   return DList_Ret_OK;
 }
 
 DListRet List_set_by_index(List *thiz, size_t index, void *value)
 {
+  List_lock(thiz);
+
   ListNode *cursor = ListNode_get_node(thiz, index, 0);
   ret_val_if_fail(NULL != cursor, DList_Ret_Fail);
 
   cursor->value = value;
+
+  List_unlock(thiz);
 
   return DList_Ret_OK;
 }
@@ -249,12 +300,20 @@ size_t List_length(List *thiz)
 {
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
 
-  return thiz->count;
+  List_lock(thiz);
+  
+  size_t len = thiz->count;
+
+  List_unlock(thiz);
+
+  return len;
 }
 
 DListRet List_foreach(List *thiz, ListDataVisitFunc visit, void *ctx)
 {
   ret_val_if_fail(NULL != thiz, DList_Ret_InvalidParams);
+
+  List_lock(thiz);
 
   ListNode *iter = thiz->first;
   while (NULL != iter)
@@ -262,6 +321,8 @@ DListRet List_foreach(List *thiz, ListDataVisitFunc visit, void *ctx)
     visit(ctx, iter->value);
     iter = iter->next;
   }
+
+  List_unlock(thiz);
 
   return DList_Ret_OK;
 }
@@ -276,7 +337,7 @@ void test_int_dlist(void)
   int i = 0;
   int n = 100;
   int data = 0;
-  List *dlist = List_create();
+  List *dlist = List_create(NULL);
 
   for (i = 0; i < n; ++i)
   {
