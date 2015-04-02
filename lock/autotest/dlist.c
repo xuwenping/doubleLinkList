@@ -48,6 +48,9 @@ static void ListNode_destroy(ListNode *node)
   free(node);
 }
 
+/*
+ * add lock for list
+ */
 static void List_lock(List *thiz)
 {
   if((NULL != thiz) && (NULL != thiz->locker))
@@ -56,6 +59,9 @@ static void List_lock(List *thiz)
   }
 }
 
+/*
+ * unlock for list
+ */
 static void List_unlock(List *thiz)
 {
   if((NULL != thiz) && (NULL != thiz->locker))
@@ -64,6 +70,9 @@ static void List_unlock(List *thiz)
   }
 }
 
+/*
+ * destroy lock
+ */
 static void List_destroy_locker(List *thiz)
 {
   if((NULL != thiz) && (NULL != thiz->locker))
@@ -331,7 +340,7 @@ DListRet List_foreach(List *thiz, ListDataVisitFunc visit, void *ctx)
 
 #include <assert.h>
 
-void test_int_dlist(void)
+static void test_int_dlist(void)
 {
   int s = 0;
   int i = 0;
@@ -368,7 +377,7 @@ void test_int_dlist(void)
   assert(List_destroy(dlist) == DList_Ret_OK);
 }
 
-void test_invalid_params()
+static void test_invalid_params()
 {
   printf("=========warning is normal begin========\n");
   assert(List_length(NULL) == DList_Ret_InvalidParams);
@@ -377,11 +386,57 @@ void test_invalid_params()
   assert(List_pop(NULL) == DList_Ret_InvalidParams);
   printf("=========warning is normal end========\n");
 }
-
-int main()
+static void single_thread_test()
 {
   test_int_dlist();
   test_invalid_params();
+}
+
+static void *produce(void *param)
+{
+  int i = 0;
+  List *thiz = (List *)param;
+  for(i = 0; i < 100; ++i)
+  {
+    assert(List_push(thiz, (void *)i) == DList_Ret_OK);
+  }
+
+  return NULL;
+}
+
+static void *consume(void *param)
+{
+  List *thiz = (List *)param;
+  int i = 0;
+  for(i = 0; i < 100; ++i)
+  {
+    assert(List_pop(thiz) == DList_Ret_OK);
+  }
+
+  return NULL;
+}
+
+static void multi_thread_test()
+{
+  pthread_t t1 = 0;
+  pthread_t t2 = 0;
+
+  Locker *locker = locker_pthread_create();
+  List *dlist = List_create(locker);
+  assert(NULL != dlist);
+  pthread_create(&t1, NULL, produce, dlist);
+  pthread_create(&t2, NULL, consume, dlist);
+
+  pthread_join(&t2, NULL);
+  pthread_join(&t2, NULL);
+
+  //assert(List_destroy(dlist) == DList_Ret_OK);
+}
+
+int main()
+{
+//  single_thread_test();
+  multi_thread_test();
   return 0;
 }
 
