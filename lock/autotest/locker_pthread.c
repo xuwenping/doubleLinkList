@@ -47,6 +47,8 @@ Locker *locker_pthread_create()
 
     pthread_mutex_init(&(priv->mutex), NULL);
   }
+
+  return thiz;
 }
 
 

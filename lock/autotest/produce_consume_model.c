@@ -40,7 +40,7 @@ void lock_test(List *thiz)
 
 int main()
 {
-  List *thiz = List_create();
+  List *thiz = List_create(NULL);
   lock_test(thiz); 
 
   List_destroy(thiz);

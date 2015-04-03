@@ -427,10 +427,10 @@ static void multi_thread_test()
   pthread_create(&t1, NULL, produce, dlist);
   pthread_create(&t2, NULL, consume, dlist);
 
-  pthread_join(&t2, NULL);
-  pthread_join(&t2, NULL);
+  pthread_join(t2, NULL);
+  pthread_join(t1, NULL);
 
-  //assert(List_destroy(dlist) == DList_Ret_OK);
+  assert(List_destroy(dlist) == DList_Ret_OK);
 }
 
 int main()
