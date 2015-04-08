@@ -1,0 +1,79 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+DLIST_H	dlist.h	9;"	d
+DListRet	typedef.h	/^}DListRet;$/;"	t	typeref:enum:_DListRet
+DList_Ret_Fail	typedef.h	/^  DList_Ret_Fail,$/;"	e	enum:_DListRet
+DList_Ret_Index_Overstep	typedef.h	/^  DList_Ret_Index_Overstep$/;"	e	enum:_DListRet
+DList_Ret_InvalidParams	typedef.h	/^  DList_Ret_InvalidParams,$/;"	e	enum:_DListRet
+DList_Ret_ListIsEmpty	typedef.h	/^  DList_Ret_ListIsEmpty,$/;"	e	enum:_DListRet
+DList_Ret_MallocFail	typedef.h	/^  DList_Ret_MallocFail,$/;"	e	enum:_DListRet
+DList_Ret_OK	typedef.h	/^  DList_Ret_OK,$/;"	e	enum:_DListRet
+List	typedef.h	/^typedef struct _List List;$/;"	t	typeref:struct:_List
+ListDataVisitFunc	typedef.h	/^typedef DListRet (*ListDataVisitFunc)(void *ctx, void *value);$/;"	t
+ListNode	dlist.c	/^}ListNode;$/;"	t	typeref:struct:_ListNode	file:
+ListNode_create	dlist.c	/^static ListNode *ListNode_create(void *value)$/;"	f	file:
+ListNode_destroy	dlist.c	/^static void ListNode_destroy(ListNode *node)$/;"	f	file:
+ListNode_get_node	dlist.c	/^static ListNode *ListNode_get_node(List *thiz, size_t index, size_t fail_return_last)$/;"	f	file:
+List_create	dlist.c	/^List *List_create(Locker *locker)$/;"	f
+List_delete	dlist.c	/^DListRet List_delete(List *thiz, size_t index)$/;"	f
+List_destroy	dlist.c	/^DListRet List_destroy(List *thiz)$/;"	f
+List_destroy_locker	dlist.c	/^static void List_destroy_locker(List *thiz)$/;"	f	file:
+List_foreach	dlist.c	/^DListRet List_foreach(List *thiz, ListDataVisitFunc visit, void *ctx)$/;"	f
+List_get_by_index	dlist.c	/^DListRet List_get_by_index(List *thiz, size_t index, void **value)$/;"	f
+List_length	dlist.c	/^size_t List_length(List *thiz)$/;"	f
+List_lock	dlist.c	/^static void List_lock(List *thiz)$/;"	f	file:
+List_pop	dlist.c	/^DListRet List_pop(List *thiz)$/;"	f
+List_push	dlist.c	/^DListRet List_push(List *thiz, void *value)$/;"	f
+List_set_by_index	dlist.c	/^DListRet List_set_by_index(List *thiz, size_t index, void *value)$/;"	f
+List_unlock	dlist.c	/^static void List_unlock(List *thiz)$/;"	f	file:
+Locker	locker.h	/^typedef struct _Locker Locker;$/;"	t	typeref:struct:_Locker
+LockerDestroyFunc	locker.h	/^typedef void (*LockerDestroyFunc)(Locker *thiz);$/;"	t
+LockerLockFunc	locker.h	/^typedef DListRet (*LockerLockFunc)(Locker *thiz);$/;"	t
+LockerUnlockFunc	locker.h	/^typedef DListRet (*LockerUnlockFunc)(Locker *thiz);$/;"	t
+Locker_destroy	locker.h	/^static inline DListRet Locker_destroy(Locker *thiz)$/;"	f
+Locker_lock	locker.h	/^static inline DListRet Locker_lock(Locker *thiz)$/;"	f
+Locker_unlock	locker.h	/^static inline DListRet Locker_unlock(Locker *thiz)$/;"	f
+PrivInfo	locker_pthread.c	/^}PrivInfo;$/;"	t	typeref:struct:_PrivInfo	file:
+_DListRet	typedef.h	/^typedef enum _DListRet {$/;"	g
+_LOCKER_H	locker.h	9;"	d
+_LOCKER_PTHREAD_H	locker_pthread.h	9;"	d
+_List	dlist.c	/^struct _List {$/;"	s	file:
+_ListNode	dlist.c	/^typedef struct _ListNode {$/;"	s	file:
+_Locker	locker.h	/^struct _Locker$/;"	s
+_PRODUCE_CONSUME_MODEL_H	produce_consume_model.h	9;"	d
+_PrivInfo	locker_pthread.c	/^typedef struct _PrivInfo$/;"	s	file:
+_QUEUE_H	queue.h	9;"	d
+_TYPEDEF_H	typedef.h	9;"	d
+consume	dlist.c	/^static void *consume(void *param)$/;"	f	file:
+consume_create	produce_consume_model.c	/^void consume_create(List *thiz)$/;"	f
+count	dlist.c	/^  int count;$/;"	m	struct:_List	file:
+destroy	locker.h	/^  LockerDestroyFunc destroy;$/;"	m	struct:_Locker
+first	dlist.c	/^  ListNode *first;$/;"	m	struct:_List	file:
+last	dlist.c	/^  ListNode *last;$/;"	m	struct:_List	file:
+lock	locker.h	/^  LockerLockFunc lock;$/;"	m	struct:_Locker
+lock_test	produce_consume_model.c	/^void lock_test(List *thiz)$/;"	f
+locker	dlist.c	/^  Locker *locker;$/;"	m	struct:_List	file:
+locker_pthread_create	locker_pthread.c	/^Locker *locker_pthread_create()$/;"	f
+locker_pthread_destroy	locker_pthread.c	/^static void locker_pthread_destroy(Locker *thiz)$/;"	f	file:
+locker_pthread_lock	locker_pthread.c	/^static DListRet locker_pthread_lock(Locker *thiz)$/;"	f	file:
+locker_pthread_unlock	locker_pthread.c	/^static DListRet locker_pthread_unlock(Locker *thiz)$/;"	f	file:
+main	dlist.c	/^int main()$/;"	f
+main	produce_consume_model.c	/^int main()$/;"	f
+multi_thread_test	dlist.c	/^static void multi_thread_test()$/;"	f	file:
+mutex	locker_pthread.c	/^  pthread_mutex_t mutex;$/;"	m	struct:_PrivInfo	file:
+next	dlist.c	/^  struct _ListNode *next;$/;"	m	struct:_ListNode	typeref:struct:_ListNode::_ListNode	file:
+prev	dlist.c	/^  struct _ListNode *prev;$/;"	m	struct:_ListNode	typeref:struct:_ListNode::_ListNode	file:
+priv	locker.h	/^  char priv[0];$/;"	m	struct:_Locker
+produce	dlist.c	/^static void *produce(void *param)$/;"	f	file:
+produce_create	produce_consume_model.c	/^void produce_create(List *thiz)$/;"	f
+ret_if_fail	typedef.h	15;"	d
+ret_val_if_fail	typedef.h	19;"	d
+single_thread_test	dlist.c	/^static void single_thread_test()$/;"	f	file:
+test_int_dlist	dlist.c	/^static void test_int_dlist(void)$/;"	f	file:
+test_invalid_params	dlist.c	/^static void test_invalid_params()$/;"	f	file:
+unlock	locker.h	/^  LockerUnlockFunc unlock;$/;"	m	struct:_Locker
+value	dlist.c	/^  void *value;$/;"	m	struct:_ListNode	file:
