@@ -55,7 +55,7 @@ int main()
   memset(&peeraddr, 0, sizeof(peeraddr));
   socklen_t peerlen = sizeof(peeraddr);
   int conn;
-  if((conn = accept(listenfd, (struct sockaddr *)&peeraddr, peerlen)) < 0)
+  if((conn = accept(listenfd, (struct sockaddr *)&peeraddr, &peerlen)) < 0)
   {
     ERR_EXIT("accept error");
   }
@@ -66,8 +66,14 @@ int main()
   while(1)
   {
     memset(recvbuf, 0, sizeof(recvbuf));
+
+    // read client data by conncet fd
     int ret = read(conn, recvbuf, sizeof(recvbuf));
+
+    // put the receive data on stdout
     fputs(recvbuf, stdout);
+
+    // write data to client by connect fd
     write(conn, recvbuf, ret);
   }
 
