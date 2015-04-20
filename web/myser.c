@@ -58,19 +58,22 @@ int main()
   while(1)
   {
     memset(&recvmsg, 0, sizeof(recvmsg));
-    if(0 > recv(connfd, recvmsg, sizeof(recvmsg), 0)) 
+    int n = recv(connfd, recvmsg, sizeof(recvmsg), 0);
+    printf("the ser n is %d, the recvmsg[%d] is %c\n", n, recvmsg[n]);
+    if(0 > n) 
     {
       perror("recv fail");
       return 0;
     }
+    //recvmsg[n] = '\0'; 
     printf("the recv string is %s\n", recvmsg);
-  
-    char s[] = {"Client Query\n"};
+    char s[] = {"Client Query"};
     int r = strcmp(s, recvmsg);
     printf("r is %d\n", r);
     if(0 == r)
     {
-      printf("Recevie Query\n"); 
+      fputs(recvmsg, stdout);
+      //printf("Recevie Query\n"); 
     }
   }
 

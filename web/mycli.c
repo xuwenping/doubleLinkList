@@ -35,9 +35,17 @@ int main()
   }
   
   char sendmsg[1024] = {0};
-  while(fgets(sendmsg, sizeof(sendmsg), stdin))
-  {
-    send(sockfd, sendmsg, strlen(sendmsg), 0);
+  while(1)
+  { 
+    printf("Enter string to send:");
+    fgets(sendmsg, sizeof(sendmsg), stdin);
+    printf("the msg is %s.\n", sendmsg);
+    //scanf("%s", sendmsg);
+    if(!strcmp(sendmsg, "quit\n"))
+      break;
+    int n = send(sockfd, sendmsg, strlen(sendmsg), 0);
+    printf("the cli n is %d, the sendmsg[%d] is %c\n", n, sendmsg[n]);
+    sendmsg[n] = '\0';
 
     memset(sendmsg, 0, sizeof(sendmsg));
   }
